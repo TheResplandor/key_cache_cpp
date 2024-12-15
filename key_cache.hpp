@@ -5,6 +5,7 @@
 #include <list>
 #include <mutex>
 #include <shared_mutex>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 
@@ -49,9 +50,11 @@ public:
     {
         std::unique_lock<std::shared_mutex> wlock(m_mtx);
 
-        if (m_vals.contains(key)) {
+        auto found_pair = m_vals.find(key);
+
+        if (found_pair != m_vals.end()) {
             // If key exists, remove it and re-add it later as the newest.
-            m_order.erase(m_vals[key].second);
+            m_order.erase(found_pair->second.second);
         } else if (m_capacity == m_size) {
             // If capacity is full, remove the oldest key and add a new one.
             auto oldest_key = std::prev(m_order.cend());
@@ -85,11 +88,13 @@ public:
     {
         std::shared_lock<std::shared_mutex> rlock(m_mtx);
 
-        if (!m_vals.contains(key)) {
+        auto found_pair = m_vals.find(key);
+
+        if (found_pair == m_vals.end()) {
             return key_cache_statuses::KEY_NOT_FOUND;
         }
 
-        val = m_vals[key].first;
+        std::tie(val, std::ignore) = found_pair->second;
 
         return key_cache_statuses::SUCCESS;
     }
