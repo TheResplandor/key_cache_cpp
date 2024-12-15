@@ -53,7 +53,11 @@ public:
         auto found_pair = m_vals.find(key);
 
         if (found_pair != m_vals.end()) {
-            // If key exists, remove it and re-add it later as the newest.
+            // Avoid re-adding existing key-value pairs.
+            if (val == found_pair->second.first) {
+                return key_cache_statuses::SUCCESS;
+            }
+            // Else remove the already existing key and add it as a new one.
             m_order.erase(found_pair->second.second);
         } else if (m_capacity == m_size) {
             // If capacity is full, remove the oldest key and add a new one.
@@ -100,7 +104,7 @@ public:
     }
 
 private:
-    size_t const m_capacity;
+    size_t m_capacity;
     size_t m_size;
     std::list<KT> m_order;
     std::unordered_map<KT,
