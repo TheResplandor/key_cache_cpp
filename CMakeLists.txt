@@ -8,4 +8,8 @@ else()
     add_compile_options(-Wall -Wextra -Werror -O0)
 endif()
 
-add_executable(key_cache main.cpp key_cache.hpp)
+set(APP_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${APP_ROOT_DIR})
+
+get_filename_component(PROJECT_NAME "${CMAKE_CURRENT_SOURCE_DIR}" NAME)
+add_executable(${PROJECT_NAME} main.cpp key_cache.hpp)

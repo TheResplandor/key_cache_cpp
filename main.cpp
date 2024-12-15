@@ -11,17 +11,12 @@
 
 using namespace std;
 
-#define UNUSED(var) (void)(var)
-
-int main(int argc, char* argv[])
+int main()
 {
-    UNUSED(argc);
-    UNUSED(argv);
-
-    key_cache<char const*, int> cache { 3 };
+    key_cache<string, int> cache { 3 };
     key_cache_statuses status = key_cache_statuses::UNINITIALIZED;
     int val = 0;
-    int val3 = 7;
+    int val7 = 7;
 
     cache.add("hi", 1);
     cache.add("bi", 2);
@@ -44,7 +39,7 @@ int main(int argc, char* argv[])
 
     cache.add("new1", 5);
     cache.add("new2", 6);
-    cache.add("new3", val3);
+    cache.add("new3", val7);
 
     status = cache.get("bi", val);
     if (status != key_cache_statuses::SUCCESS) {
@@ -53,7 +48,7 @@ int main(int argc, char* argv[])
         cout << "val = " << val << "\n";
     }
 
-    val3 = 777;
+    val7 = 777;
     status = cache.get("new3", val);
     if (status != key_cache_statuses::SUCCESS) {
         cout << "failed 4\n";

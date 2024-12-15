@@ -3,7 +3,6 @@
 
 #include <concepts>
 #include <list>
-#include <memory>
 #include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
