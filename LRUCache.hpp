@@ -34,9 +34,9 @@ public:
     LRUCache(size_t capacity):
         m_capacity { capacity },
         m_size { 0 },
+        m_mtx {},
         m_order {},
-        m_vals {},
-        m_mtx {}
+        m_vals {}
     {
     }
 
@@ -94,22 +94,21 @@ public:
         auto found_pair = m_vals.find(key);
 
         if (found_pair == m_vals.end()) {
-            return std::unexpected(lru_cache_status::KEY_NOT_FOUND);
+            return std::unexpected { lru_cache_status::KEY_NOT_FOUND };
         }
 
-        std::tie(val, std::ignore) = found_pair->second;
-
-        return lru_cache_status::SUCCESS;
+        return std::expected<VT, lru_cache_status> { std::in_place,
+            found_pair->second.first };
     }
 
 private:
     size_t m_capacity;
     size_t m_size;
+    std::shared_mutex m_mtx;
     std::list<KT> m_order;
     std::unordered_map<KT,
         typename std::pair<VT, typename std::list<KT>::const_iterator>>
         m_vals;
-    std::shared_mutex m_mtx;
 };
 
 #endif // LRU_CACHE_HPP
