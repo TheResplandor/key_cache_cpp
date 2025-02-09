@@ -1,5 +1,5 @@
-#ifndef KEY_CACHE_HPP
-#define KEY_CACHE_HPP
+#ifndef LRU_CACHE_HPP
+#define LRU_CACHE_HPP
 
 #include <concepts>
 #include <expected>
@@ -15,7 +15,7 @@ concept Hashable = requires(T t) {
     { std::hash<T> {}(t) } -> std::convertible_to<std::size_t>;
 };
 
-enum class key_cache_status {
+enum class lru_cache_status {
     UNINITIALIZED = -1,
     SUCCESS = 0,
     EXISTING_KEY_NOT_FOUND,
@@ -29,9 +29,9 @@ enum class key_cache_status {
  * @tparam VT Type of values to be stored in the cache.
  */
 template <Hashable KT, typename VT>
-class LURCache {
+class LRUCache {
 public:
-    LURCache(size_t capacity):
+    LRUCache(size_t capacity):
         m_capacity { capacity },
         m_size { 0 },
         m_order {},
@@ -45,9 +45,9 @@ public:
      *
      * @param[in] key The unique key of the new value.
      * @param[in] val The value to be store with the key.
-     * @return key_cache_statuses
+     * @return lru_cache_status
      */
-    key_cache_status add(KT const& key, VT const& val)
+    lru_cache_status add(KT const& key, VT const& val)
     {
         std::unique_lock<std::shared_mutex> wlock(m_mtx);
 
@@ -56,7 +56,7 @@ public:
         if (found_pair != m_vals.end()) {
             // Avoid re-adding existing key-value pairs.
             if (val == found_pair->second.first) {
-                return key_cache_status::SUCCESS;
+                return lru_cache_status::SUCCESS;
             }
             // Else remove the already existing key and add it as a new one.
             m_order.erase(found_pair->second.second);
@@ -66,7 +66,7 @@ public:
 
             size_t elems_removed = m_vals.erase(*oldest_key);
             if (elems_removed != 1) {
-                return key_cache_status::EXISTING_KEY_NOT_FOUND;
+                return lru_cache_status::EXISTING_KEY_NOT_FOUND;
             }
 
             m_order.erase(oldest_key);
@@ -78,7 +78,7 @@ public:
         m_order.push_front(key);
         m_vals[key] = std::pair { val, m_order.begin() };
 
-        return key_cache_status::SUCCESS;
+        return lru_cache_status::SUCCESS;
     }
 
     /**
@@ -87,19 +87,19 @@ public:
      * @param[in] key The key of the value to get.
      * @return the value from the cache, or status on error.
      */
-    std::expected<VT, key_cache_status> get(KT const& key)
+    std::expected<VT, lru_cache_status> get(KT const& key)
     {
         std::shared_lock<std::shared_mutex> rlock(m_mtx);
 
         auto found_pair = m_vals.find(key);
 
         if (found_pair == m_vals.end()) {
-            return std::unexpected(key_cache_status::KEY_NOT_FOUND);
+            return std::unexpected(lru_cache_status::KEY_NOT_FOUND);
         }
 
         std::tie(val, std::ignore) = found_pair->second;
 
-        return key_cache_status::SUCCESS;
+        return lru_cache_status::SUCCESS;
     }
 
 private:
@@ -112,4 +112,4 @@ private:
     std::shared_mutex m_mtx;
 };
 
-#endif // KEY_CACHE_HPP
+#endif // LRU_CACHE_HPP

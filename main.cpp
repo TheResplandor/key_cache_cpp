@@ -7,14 +7,14 @@
 #include <iostream>
 #include <memory>
 
-#include "key_cache.hpp"
+#include "LRUCache.hpp"
 
 using namespace std;
 
 int main()
 {
-    LURCache<string, int> cache { 3 };
-    key_cache_status status = key_cache_status::UNINITIALIZED;
+    LRUCache<string, int> cache { 3 };
+    lru_cache_status status = lru_cache_status::UNINITIALIZED;
     int val = 0;
     int val7 = 7;
 
@@ -23,7 +23,7 @@ int main()
     cache.add("kululu", 3);
 
     status = cache.get("bi", val);
-    if (status != key_cache_status::SUCCESS) {
+    if (status != lru_cache_status::SUCCESS) {
         cout << "failed 1";
         return 1;
     }
@@ -31,7 +31,7 @@ int main()
 
     cache.add("bi", 2233);
     status = cache.get("bi", val);
-    if (status != key_cache_status::SUCCESS) {
+    if (status != lru_cache_status::SUCCESS) {
         cout << "failed 2";
         return 1;
     }
@@ -42,7 +42,7 @@ int main()
     cache.add("new3", val7);
 
     status = cache.get("bi", val);
-    if (status != key_cache_status::SUCCESS) {
+    if (status != lru_cache_status::SUCCESS) {
         cout << "failed 3\n";
     } else {
         cout << "val = " << val << "\n";
@@ -50,7 +50,7 @@ int main()
 
     val7 = 777;
     status = cache.get("new3", val);
-    if (status != key_cache_status::SUCCESS) {
+    if (status != lru_cache_status::SUCCESS) {
         cout << "failed 4\n";
     } else {
         cout << "val = " << val << "\n";
