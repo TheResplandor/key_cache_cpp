@@ -12,5 +12,5 @@ endif()
 set(APP_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${APP_ROOT_DIR})
 
-add_executable(${PROJECT_NAME} main.cpp key_cache.hpp)
+add_executable(${PROJECT_NAME} main.cpp LRUCache.hpp)
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG _DEBUG>)
